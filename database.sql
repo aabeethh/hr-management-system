@@ -31,5 +31,5 @@ CREATE TABLE leave_requests (
 
 INSERT INTO users (username,password,role)
 VALUES
-('hradmin','1234','HR'),
-('emp1','1234','EMPLOYEE');
+('abhi','1234','HR'),
+('alvin','1234','EMPLOYEE');
