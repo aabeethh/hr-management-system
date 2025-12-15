@@ -10,35 +10,49 @@ app.use(express.json());
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
-  db.query(
-    "SELECT * FROM users WHERE username=? AND password=?",
-    [username, password],
-    (err, result) => {
-      if (result.length > 0) {
-        res.json(result[0]);
-      } else {
-        res.json({ message: "Invalid login" });
-      }
+  const sql = "SELECT role FROM users WHERE username=? AND password=?";
+  db.query(sql, [username, password], (err, result) => {
+    if (err) return res.json({ success: false });
+
+    if (result.length > 0) {
+      res.json({
+        success: true,
+        role: result[0].role
+      });
+    } else {
+      res.json({ success: false });
     }
-  );
+  });
 });
 
 /* EMPLOYEE CRUD */
-app.post("/employees", (req, res) => {
-  const { name, department, designation, phone, user_id } = req.body;
-
-  db.query(
-    "INSERT INTO employees (name,department,designation,phone,user_id) VALUES (?,?,?,?,?)",
-    [name, department, designation, phone, user_id],
-    () => res.json("Employee Added")
-  );
-});
-
 app.get("/employees", (req, res) => {
   db.query("SELECT * FROM employees", (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.json([]);
+    }
     res.json(result);
   });
 });
+
+app.post("/employees", (req, res) => {
+  const { name, department, designation, phone } = req.body;
+
+  const sql = `
+    INSERT INTO employees (name, department, designation, phone, user_id)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [name, department, designation, phone, 2], (err) => {
+    if (err) {
+      console.error("Insert error:", err);
+      return res.json({ success: false });
+    }
+    res.json({ success: true });
+  });
+});
+
 
 app.delete("/employees/:id", (req, res) => {
   db.query(
@@ -74,6 +88,19 @@ app.put("/leave/:id", (req, res) => {
     () => res.json("Leave Updated")
   );
 });
+// GET all employees (HR dashboard)
+app.get("/employees", (req, res) => {
+  const sql = "SELECT * FROM employees";
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error("Fetch employees error:", err);
+      return res.status(500).json([]);
+    }
+    res.json(result);
+  });
+});
+
 
 app.listen(3000, () => {
   console.log("Server running on port 3000");

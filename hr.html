@@ -1,31 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HR Dashboard</title>
+</head>
+<body>
+
 <h2>HR Dashboard</h2>
 
+<!-- ADD EMPLOYEE -->
 <h3>Add Employee</h3>
 <input id="name" placeholder="Name">
 <input id="dept" placeholder="Department">
 <input id="desg" placeholder="Designation">
 <input id="phone" placeholder="Phone">
-<input id="userId" placeholder="User ID">
 <button onclick="addEmployee()">Add</button>
 
+<!-- EMPLOYEE LIST -->
 <h3>Employees</h3>
 <table border="1">
   <thead>
     <tr>
-      <th>ID</th><th>Name</th><th>Dept</th><th>Role</th><th>Phone</th><th>Action</th>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Designation</th>
+      <th>Phone</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody id="empTable"></tbody>
 </table>
 
+<!-- LEAVE REQUESTS -->
 <h3>Leave Requests</h3>
 <table border="1">
   <thead>
     <tr>
-      <th>ID</th><th>Emp ID</th><th>From</th><th>To</th><th>Status</th><th>Action</th>
+      <th>Leave ID</th>
+      <th>Employee ID</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Status</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody id="leaveTable"></tbody>
 </table>
 
 <script src="script.js"></script>
+
+</body>
+</html>
