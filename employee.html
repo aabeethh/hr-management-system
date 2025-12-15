@@ -1,10 +1,54 @@
-<h2>Employee Leave Request</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Dashboard</title>
+  <link rel="stylesheet" href="employee.css">
+</head>
+<body>
 
-<input id="empId" placeholder="Employee ID">
-<input type="date" id="from">
-<input type="date" id="to">
-<input id="type" placeholder="Leave Type">
-<input id="reason" placeholder="Reason">
-<button onclick="applyLeave()">Apply</button>
+<div class="container">
+  <h2>Employee Leave Request</h2>
+
+  <div class="form-group">
+    <input id="empId" placeholder="Employee ID">
+  </div>
+
+  <div class="form-group">
+    <input type="date" id="from">
+    <input type="date" id="to">
+  </div>
+
+  <div class="form-group">
+    <input id="type" placeholder="Leave Type">
+  </div>
+
+  <div class="form-group">
+    <input id="reason" placeholder="Reason">
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="button-group">
+    <button id="applyBtn" onclick="applyLeave()">Apply Leave</button>
+    <button id="statusBtn" onclick="loadMyLeaves()">View My Leave Status</button>
+  </div>
+
+  <h3>My Leave Status</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Leave ID</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Type</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="myLeaveTable"></tbody>
+  </table>
+</div>
 
 <script src="script.js"></script>
+</body>
+</html>

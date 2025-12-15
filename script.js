@@ -92,23 +92,81 @@ function deleteEmp(id) {
     .then(() => loadEmployees());
 }
 
-/* ================= LEAVE ================= */
+
+
+
+
+/* ================= EMPLOYEE : APPLY LEAVE ================= */
 
 function applyLeave() {
+  const empId = document.getElementById("empId").value;
+  const from = document.getElementById("from").value;
+  const to = document.getElementById("to").value;
+  const type = document.getElementById("type").value;
+  const reason = document.getElementById("reason").value;
+
+  if (!empId || !from || !to || !type || !reason) {
+    alert("Please fill all fields");
+    return;
+  }
+
   fetch("http://localhost:3000/leave", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      employee_id: empId.value,
-      from_date: from.value,
-      to_date: to.value,
-      leave_type: type.value,
-      reason: reason.value
+      employee_id: empId,
+      from_date: from,
+      to_date: to,
+      leave_type: type,
+      reason: reason
     })
-  }).then(() => alert("Leave Applied"));
+  })
+    .then(() => {
+      alert("Leave Applied Successfully");
+      loadMyLeaves(); // 🔥 auto-refresh status after apply
+    })
+    .catch(err => console.error(err));
 }
 
-// LOAD leave requests (HR)
+/* ================= EMPLOYEE : VIEW LEAVE STATUS ================= */
+
+function loadMyLeaves() {
+  const empId = document.getElementById("empId").value;
+  const table = document.getElementById("myLeaveTable");
+
+  if (!empId) {
+    alert("Please enter Employee ID");
+    return;
+  }
+
+  fetch(`http://localhost:3000/leave/employee/${empId}`)
+    .then(res => res.json())
+    .then(data => {
+      table.innerHTML = "";
+
+      if (data.length === 0) {
+        table.innerHTML =
+          "<tr><td colspan='5'>No leave records found</td></tr>";
+        return;
+      }
+
+      data.forEach(l => {
+        table.innerHTML += `
+          <tr>
+            <td>${l.leave_id}</td>
+            <td>${new Date(l.from_date).toLocaleDateString()}</td>
+            <td>${new Date(l.to_date).toLocaleDateString()}</td>
+            <td>${l.leave_type}</td>
+            <td>${l.status}</td>
+          </tr>
+        `;
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Failed to load leave status");
+    });
+}
 function loadLeaves() {
   fetch("http://localhost:3000/leave")
     .then(res => res.json())
@@ -118,13 +176,19 @@ function loadLeaves() {
 
       leaveTable.innerHTML = "";
 
+      if (data.length === 0) {
+        leaveTable.innerHTML =
+          "<tr><td colspan='6'>No leave requests</td></tr>";
+        return;
+      }
+
       data.forEach(l => {
         leaveTable.innerHTML += `
           <tr>
             <td>${l.leave_id}</td>
             <td>${l.employee_id}</td>
-            <td>${l.from_date}</td>
-            <td>${l.to_date}</td>
+            <td>${new Date(l.from_date).toLocaleDateString()}</td>
+            <td>${new Date(l.to_date).toLocaleDateString()}</td>
             <td>${l.status}</td>
             <td>
               <button onclick="updateLeave(${l.leave_id}, 'Approved')">Approve</button>
@@ -133,7 +197,43 @@ function loadLeaves() {
           </tr>
         `;
       });
-    });
+    })
+    .catch(err => console.error(err));
+}
+/* ================= LEAVE (HR) ================= */
+
+function loadLeaves() {
+  fetch("http://localhost:3000/leave")
+    .then(res => res.json())
+    .then(data => {
+      const leaveTable = document.getElementById("leaveTable");
+      if (!leaveTable) return;
+
+      leaveTable.innerHTML = "";
+
+      if (data.length === 0) {
+        leaveTable.innerHTML =
+          "<tr><td colspan='6'>No leave requests</td></tr>";
+        return;
+      }
+
+      data.forEach(l => {
+        leaveTable.innerHTML += `
+          <tr>
+            <td>${l.leave_id}</td>
+            <td>${l.employee_id}</td>
+            <td>${new Date(l.from_date).toLocaleDateString()}</td>
+            <td>${new Date(l.to_date).toLocaleDateString()}</td>
+            <td>${l.status}</td>
+            <td>
+              <button onclick="updateLeave(${l.leave_id}, 'Approved')">Approve</button>
+              <button onclick="updateLeave(${l.leave_id}, 'Rejected')">Reject</button>
+            </td>
+          </tr>
+        `;
+      });
+    })
+    .catch(err => console.error("Load leaves error:", err));
 }
 
 function updateLeave(id, status) {
@@ -141,11 +241,22 @@ function updateLeave(id, status) {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status })
-  }).then(() => loadLeaves());
+  })
+    .then(res => res.json())
+    .then(() => {
+      alert(`Leave ${status}`);
+      loadLeaves(); // 🔥 refresh table
+    })
+    .catch(err => console.error("Update leave error:", err));
 }
 
-/* ================= AUTO LOAD ================= */
+
 document.addEventListener("DOMContentLoaded", () => {
-  loadEmployees();
-  loadLeaves();
+  if (document.getElementById("empTable")) {
+    loadEmployees();
+  }
+  if (document.getElementById("leaveTable")) {
+    loadLeaves();
+  }
 });
+
